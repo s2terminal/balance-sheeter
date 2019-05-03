@@ -24,7 +24,8 @@ class BalanceSheetForm extends React.Component<Props, State> {
 
   constructor(props) {
     super(props);
-    this.state = this.loadQueryString();
+    const loadedData = this.loadQueryString();
+    if (loadedData) { this.state = loadedData }
   }
 
   handleChange = (name: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
