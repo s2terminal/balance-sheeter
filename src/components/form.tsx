@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, Grid, Card, Button } from '@material-ui/core';
+import { TextField, Grid, Card, Button,AppBar,Toolbar, Link, Typography } from '@material-ui/core';
 import { assetItems, liabilityItems, _ } from './config';
 import Graph from './graph';
 
@@ -116,16 +116,20 @@ class BalanceSheetForm extends React.Component<Props, State> {
 
   generateTextField = (elem: IBSItem) => {
     const val = this.state.bs[elem.dateIndex][elem.name] ? this.state.bs[elem.dateIndex][elem.name] : 0;
-    return <TextField
-      id={`bs-${elem.dateIndex}-${elem.name}`}
-      key={`bs-${elem.dateIndex}-${elem.name}`}
-      label={`${elem.label}`}
-      value={val}
-      onChange={this.handleChangeBS(elem.dateIndex, elem.name)}
-      onBlur={this.handleBlur}
-      error={val < 0}
-      helperText={val < 0 && _.excessDebtError}
-    />
+    return (
+      <div>
+        <TextField
+          id={`bs-${elem.dateIndex}-${elem.name}`}
+          key={`bs-${elem.dateIndex}-${elem.name}`}
+          label={`${elem.label}`}
+          value={val}
+          onChange={this.handleChangeBS(elem.dateIndex, elem.name)}
+          onBlur={this.handleBlur}
+          error={val < 0}
+          helperText={val < 0 && _.excessDebtError}
+        />
+      </div>
+    )
   }
 
   render() {
@@ -156,19 +160,24 @@ class BalanceSheetForm extends React.Component<Props, State> {
 
     return (
       <>
-        <Card style={{margin: "1rem", padding: "0 1rem"}}>
-          <h1>
-          <TextField
-            placeholder="title"
-            value={this.state.title}
-            onChange={(e) => { this.setState({title: e.target.value}); }}
-            onBlur={this.handleBlur}
-          />
-          </h1>
+        <AppBar position="static" color="secondary">
+          <Toolbar>
+            <TextField
+              placeholder="title"
+              value={this.state.title}
+              onChange={(e) => { this.setState({title: e.target.value}); }}
+              onBlur={this.handleBlur}
+              fullWidth
+            />
+          </Toolbar>
+        </AppBar>
+        <div style={{margin: '1rem'}}>
           <Graph data={this.state} />
-        </Card>
-        <form>
-          <h2>Data</h2>
+        </div>
+        <form style={{margin: '1rem'}}>
+          <Typography variant="h5" component="h2">
+            {_.data}
+          </Typography>
           {fields}
           <Card style={{margin: "1rem", padding: "1rem"}}>
             <Button variant="contained" color="primary" onClick={this.handleClickAdd} style={{float: "right"}}>
@@ -176,6 +185,14 @@ class BalanceSheetForm extends React.Component<Props, State> {
             </Button>
           </Card>
         </form>
+        <AppBar position="static" color="primary" style={{padding: "1rem"}}>
+          <p>
+            Balance Sheeter / 貸借対照表を箱型グラフにするやつ
+          </p>
+          <p>
+            <Link href={"https://github.com/s2terminal/balance-sheeter"} target={"blank"} color="inherit">Source Code</Link> by <Link href={"https://s2terminal.com"} target={"blank"} color="inherit">@s2terminal</Link>
+          </p>
+        </AppBar>
       </>
     );
   }

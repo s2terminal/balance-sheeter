@@ -9,6 +9,7 @@ export const liabilityItems = [
   { name: 'equity', label: '純資産' }
 ];
 export const _ = {
+  data: 'データ',
   add: 'ふやす',
   remove: '消す',
   asset: '資産',
