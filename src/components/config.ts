@@ -8,3 +8,9 @@ export const liabilityItems = [
   { name: 'nonCurrentLiabilities', label: '固定負債' },
   { name: 'equity', label: '純資産' }
 ];
+export const _ = {
+  asset: '資産',
+  liability: '負債',
+  fy: '会計年度',
+  excessDebtError: '債務超過のグラフは正常に表示されません'
+};

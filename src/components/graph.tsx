@@ -1,5 +1,5 @@
 import React from 'react';
-import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
+import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts';
 import Color from 'color';
 import { assetItems, liabilityItems } from './config';
 
@@ -26,16 +26,17 @@ const Graph = (data) => {
   });
 
   return (
-    <BarChart width={600} height={300} data={graphData}
-        margin={{top: 20, right: 30, left: 20, bottom: 5}}>
-      <CartesianGrid strokeDasharray="3 3"/>
-      <XAxis dataKey="name"/>
-      <YAxis/>
-      <Tooltip/>
-      <Legend />
-      {assetBars}
-      {liabilityBars}
-    </BarChart>
+    <ResponsiveContainer height={320}>
+      <BarChart data={graphData}>
+        <CartesianGrid strokeDasharray="3 3"/>
+        <XAxis dataKey="name"/>
+        <YAxis/>
+        <Tooltip/>
+        <Legend />
+        {assetBars}
+        {liabilityBars}
+      </BarChart>
+    </ResponsiveContainer>
   )
 }
 
