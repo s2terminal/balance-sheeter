@@ -3,6 +3,18 @@ import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveC
 import Color from 'color';
 import { assetItems, liabilityItems } from './config';
 
+const formatter = (number: number) => {
+  if (number > 1000000000) {
+    return (number/1000000000).toString() + 'B';
+  } else if (number > 1000000) {
+    return (number/1000000).toString() + 'M';
+  } else if (number > 1000) {
+    return (number/1000).toString() + 'K';
+  } else {
+    return number.toString();
+  }
+}
+
 const Graph = (data) => {
   const assetBars = assetItems.map(function(elem, index) {
     const color = Color.rgb(255, 64, 0).lighten(0.1 + index * 0.25);
@@ -30,7 +42,7 @@ const Graph = (data) => {
       <BarChart data={graphData}>
         <CartesianGrid strokeDasharray="3 3"/>
         <XAxis dataKey="name"/>
-        <YAxis/>
+        <YAxis tickFormatter={formatter}/>
         <Tooltip/>
         <Legend />
         {assetBars}

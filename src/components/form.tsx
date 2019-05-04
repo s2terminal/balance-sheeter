@@ -3,7 +3,7 @@ import { TextField, Grid, Card, Button } from '@material-ui/core';
 import { assetItems, liabilityItems, _ } from './config';
 import Graph from './graph';
 
-class BSData {
+interface IBSData {
   // ASSETS
   cash: number | null;
   currentAssets: number | null;
@@ -12,19 +12,48 @@ class BSData {
   currentLiabilities: number | null;
   nonCurrentLiabilities: number | null;
   equity: number | null;
+}
+
+class BSData implements IBSData {
+  cash: number | null;
+  currentAssets: number | null;
+  nonCurrentAssets: number | null;
+  currentLiabilities: number | null;
+  nonCurrentLiabilities: number | null;
+  equity: number | null;
 
   constructor(public date: string = "") {
   }
+
+  static forceCastProperties(data: IBSData) {
+    data.cash = BSData.anywayParseInt(data.cash);
+    data.currentAssets = BSData.anywayParseInt(data.currentAssets);
+    data.nonCurrentAssets = BSData.anywayParseInt(data.nonCurrentAssets);
+    data.currentLiabilities = BSData.anywayParseInt(data.currentLiabilities);
+    data.nonCurrentLiabilities = BSData.anywayParseInt(data.nonCurrentLiabilities);
+    data.equity = BSData.anywayParseInt(data.equity);
+    return data;
+  }
+  static anywayParseInt(param: (number | string)) {
+    switch (typeof param) {
+      case 'number':
+        return param
+      default:
+        return parseInt(param);
+    }
+  }
+
 }
-interface BSItem {
+type IKeyOfBSItem = (keyof IBSData | 'title' | 'date');
+interface IBSItem {
   dateIndex: number;
-  name: keyof BSData;
+  name: IKeyOfBSItem;
   label: string;
 }
 type Props = any;
 interface State {
   title: string;
-  bs: BSData[]
+  bs: IBSData[]
 };
 
 const saveQueryStringKey = 'bs';
@@ -42,7 +71,7 @@ class BalanceSheetForm extends React.Component<Props, State> {
     }
   }
 
-  handleChangeBS = (dateIndex: number, name: keyof BSData) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  handleChangeBS = (dateIndex: number, name: IKeyOfBSItem) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     this.setState((prevState) => {
       prevState.bs[dateIndex][name] = value;
@@ -70,17 +99,23 @@ class BalanceSheetForm extends React.Component<Props, State> {
     window.history.pushState(null, null, url.toString());
   }
 
-  loadQueryString() {
+  loadQueryString(): State | null {
     try {
       const url = new URL(window.location.href);
-      return JSON.parse(url.searchParams.get(saveQueryStringKey));
+      let data = JSON.parse(url.searchParams.get(saveQueryStringKey)) as State;
+
+      data.bs = data.bs.map((bs) => {
+        return BSData.forceCastProperties(bs);
+      });
+
+      return data;
     } catch (error) {
       return null;
     }
   }
 
-  generateTextField = (elem: BSItem) => {
-    const val = this.state.bs[elem.dateIndex][elem.name] ? this.state.bs[elem.dateIndex][elem.name] : '';
+  generateTextField = (elem: IBSItem) => {
+    const val = this.state.bs[elem.dateIndex][elem.name] ? this.state.bs[elem.dateIndex][elem.name] : 0;
     return <TextField
       id={`bs-${elem.dateIndex}-${elem.name}`}
       key={`bs-${elem.dateIndex}-${elem.name}`}
@@ -124,9 +159,10 @@ class BalanceSheetForm extends React.Component<Props, State> {
         <Card style={{margin: "1rem", padding: "0 1rem"}}>
           <h1>
           <TextField
-            label="title"
+            placeholder="title"
             value={this.state.title}
             onChange={(e) => { this.setState({title: e.target.value}); }}
+            onBlur={this.handleBlur}
           />
           </h1>
           <Graph data={this.state} />
