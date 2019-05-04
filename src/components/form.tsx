@@ -25,6 +25,28 @@ class BSData implements IBSData {
   constructor(public date: string = "") {
   }
 
+  static generateByIBSData(data: IBSData) {
+    const obj = new BSData();
+    obj.cash = data.cash;
+    obj.currentAssets = data.currentAssets;
+    obj.nonCurrentAssets = data.nonCurrentAssets;
+    obj.currentLiabilities = data.currentLiabilities;
+    obj.nonCurrentLiabilities = data.nonCurrentLiabilities;
+    obj.equity = data.equity;
+    return obj;
+  }
+
+  totalAssets() {
+    return Number(this.cash + this.currentAssets + this.nonCurrentAssets);
+  }
+  totalDebt() {
+    return Number(this.currentLiabilities + this.nonCurrentLiabilities);
+  }
+  // Capital Adequacy Ratio
+  car() {
+    return Number((this.totalAssets() - this.totalDebt()) / this.totalAssets());
+  }
+
   static forceCastProperties(data: IBSData) {
     data.cash = BSData.anywayParseInt(data.cash);
     data.currentAssets = BSData.anywayParseInt(data.currentAssets);
@@ -57,6 +79,10 @@ interface State {
 };
 
 const saveQueryStringKey = 'bs';
+
+const formatPercent = (num) => {
+  return `${Math.round(num * 100)}%`;
+}
 
 class BalanceSheetForm extends React.Component<Props, State> {
   constructor(props) {
@@ -134,6 +160,7 @@ class BalanceSheetForm extends React.Component<Props, State> {
 
   render() {
     const fields = this.state.bs.map((bs, index) => {
+      const data = BSData.generateByIBSData(bs);
       return (
         <Card key={`input-form-${index}`} style={{margin: "1rem", padding: "0 1rem 1rem"}}>
           <h3>{this.generateTextField({ name: 'date', label: _.fy, dateIndex: index })}</h3>
@@ -151,6 +178,7 @@ class BalanceSheetForm extends React.Component<Props, State> {
               }, this)}
             </Grid>
           </Grid>
+          {_.car}: {formatPercent(data.car())}
           <Button variant="contained" color="secondary" onClick={() => this.handleClickRemove(index)} style={{float: "right"}}>
             {_.remove}
           </Button>

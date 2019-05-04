@@ -15,5 +15,6 @@ export const _ = {
   asset: '資産',
   liability: '負債',
   fy: '会計年度',
+  car: '自己資本比率', // Capital Adequacy Ratio
   excessDebtError: '債務超過のグラフは正常に表示されません'
 };
