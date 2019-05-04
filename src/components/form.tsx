@@ -1,10 +1,9 @@
 import React from 'react';
-import { TextField, Grid, Card } from '@material-ui/core';
+import { TextField, Grid, Card, Button } from '@material-ui/core';
 import { assetItems, liabilityItems, _ } from './config';
 import Graph from './graph';
 
-interface BSData {
-  date: string;
+class BSData {
   // ASSETS
   cash: number | null;
   currentAssets: number | null;
@@ -13,6 +12,9 @@ interface BSData {
   currentLiabilities: number | null;
   nonCurrentLiabilities: number | null;
   equity: number | null;
+
+  constructor(public date: string = "") {
+  }
 }
 interface BSItem {
   dateIndex: number;
@@ -21,44 +23,23 @@ interface BSItem {
 }
 type Props = any;
 interface State {
+  title: string;
   bs: BSData[]
 };
 
 const saveQueryStringKey = 'bs';
-const saveQueryStringOrder = ['cash','currentAssets','nonCurrentAssets','currentLiabilities','nonCurrentLiabilities','equity'];
 
 class BalanceSheetForm extends React.Component<Props, State> {
-  state: State = {
-    bs: [
-      {
-        date: 'FY2018',
-        // ASSETS
-        cash: null,
-        currentAssets: null,
-        nonCurrentAssets: null,
-        // LIABILITIES and EQUITY
-        currentLiabilities: null,
-        nonCurrentLiabilities: null,
-        equity: null
-      },
-      {
-        date: 'FY2019',
-        // ASSETS
-        cash: null,
-        currentAssets: null,
-        nonCurrentAssets: null,
-        // LIABILITIES and EQUITY
-        currentLiabilities: null,
-        nonCurrentLiabilities: null,
-        equity: null
-      }
-    ]
-  };
-
   constructor(props) {
     super(props);
     const loadedData = this.loadQueryString();
-    if (loadedData) { this.state = loadedData; }
+    if (loadedData) {
+      this.state = loadedData;
+    } else {
+      this.state = { title: '', bs: [] };
+      this.state.bs.push((new BSData("FY2018")));
+      this.state.bs.push((new BSData("FY2019")));
+    }
   }
 
   handleChangeBS = (dateIndex: number, name: keyof BSData) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,6 +52,16 @@ class BalanceSheetForm extends React.Component<Props, State> {
 
   handleBlur = () => {
     this.saveQueryString(this.state);
+  }
+
+  handleClickAdd = () => {
+    const bs = this.state.bs;
+    bs.push(new BSData);
+    this.setState({bs});
+  }
+  handleClickRemove(index: number) {
+    const bs = this.state.bs.filter((e,i) => { return i != index; });
+    this.setState({ bs });
   }
 
   saveQueryString = (state: State) => {
@@ -105,7 +96,7 @@ class BalanceSheetForm extends React.Component<Props, State> {
   render() {
     const fields = this.state.bs.map((bs, index) => {
       return (
-        <Card key={`input-form-${index}`} style={{margin: "1rem", padding: "1rem"}}>
+        <Card key={`input-form-${index}`} style={{margin: "1rem", padding: "0 1rem 1rem"}}>
           <h3>{this.generateTextField({ name: 'date', label: _.fy, dateIndex: index })}</h3>
           <Grid container spacing={8}>
             <Grid item xs={4}>
@@ -121,15 +112,33 @@ class BalanceSheetForm extends React.Component<Props, State> {
               }, this)}
             </Grid>
           </Grid>
+          <Button variant="contained" color="secondary" onClick={() => this.handleClickRemove(index)} style={{float: "right"}}>
+            {_.remove}
+          </Button>
         </Card>
       );
     }, this);
 
     return (
       <>
-        <Graph data={this.state} />
+        <Card style={{margin: "1rem", padding: "0 1rem"}}>
+          <h1>
+          <TextField
+            label="title"
+            value={this.state.title}
+            onChange={(e) => { this.setState({title: e.target.value}); }}
+          />
+          </h1>
+          <Graph data={this.state} />
+        </Card>
         <form>
+          <h2>Data</h2>
           {fields}
+          <Card style={{margin: "1rem", padding: "1rem"}}>
+            <Button variant="contained" color="primary" onClick={this.handleClickAdd} style={{float: "right"}}>
+              {_.add}
+            </Button>
+          </Card>
         </form>
       </>
     );

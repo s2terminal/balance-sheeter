@@ -9,6 +9,8 @@ export const liabilityItems = [
   { name: 'equity', label: '純資産' }
 ];
 export const _ = {
+  add: 'ふやす',
+  remove: '消す',
   asset: '資産',
   liability: '負債',
   fy: '会計年度',
