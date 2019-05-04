@@ -13,17 +13,17 @@ const Graph = (data) => {
     return <Bar stackId="b" key={elem.name} dataKey={elem.name} name={elem.label} fill={color.string()} stroke="#333" label />;
   }).reverse();
 
-  const graphData = [
-    {
-      // name: 'FY2018',
-      cash: data.data.cash,
-      currentAssets: data.data.currentAssets,
-      nonCurrentAssets: data.data.nonCurrentAssets,
-      currentLiabilities: data.data.currentLiabilities,
-      nonCurrentLiabilities: data.data.nonCurrentLiabilities,
-      equity: data.data.equity
+  const graphData = data.data.bs.map((bs, index) => {
+    return {
+      name: bs.date,
+      cash: bs.cash,
+      currentAssets: bs.currentAssets,
+      nonCurrentAssets: bs.nonCurrentAssets,
+      currentLiabilities: bs.currentLiabilities,
+      nonCurrentLiabilities: bs.nonCurrentLiabilities,
+      equity: bs.equity
     }
-  ];
+  });
 
   return (
     <BarChart width={600} height={300} data={graphData}

@@ -1,25 +1,42 @@
 import React from 'react';
-import TextField from '@material-ui/core/TextField';
+import { TextField, Grid } from '@material-ui/core';
 import { assetItems, liabilityItems } from './config';
 import Graph from './graph';
 
 type Props = any;
 type State = any;
 interface BSItem {
+  dateIndex: number;
   name: string;
   label: string;
 }
 
 class BalanceSheetForm extends React.Component<Props, State> {
   state: State = {
-    // ASSETS
-    cash: null,
-    currentAssets: null,
-    nonCurrentAssets: null,
-    // LIABILITIES and EQUITY
-    currentLiabilities: null,
-    nonCurrentLiabilities: null,
-    equity: null,
+    bs: [
+      {
+        date: 'FY2018',
+        // ASSETS
+        cash: null,
+        currentAssets: null,
+        nonCurrentAssets: null,
+        // LIABILITIES and EQUITY
+        currentLiabilities: null,
+        nonCurrentLiabilities: null,
+        equity: null
+      },
+      {
+        date: 'FY2019',
+        // ASSETS
+        cash: null,
+        currentAssets: null,
+        nonCurrentAssets: null,
+        // LIABILITIES and EQUITY
+        currentLiabilities: null,
+        nonCurrentLiabilities: null,
+        equity: null
+      }
+    ]
   };
 
   constructor(props) {
@@ -28,9 +45,14 @@ class BalanceSheetForm extends React.Component<Props, State> {
     if (loadedData) { this.state = loadedData }
   }
 
-  handleChange = (name: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ [name]: event.target.value } as Pick<State, keyof State>);
+  handleChangeBS = (dateIndex: number, name: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    this.setState((prevState) => {
+      prevState.bs[dateIndex][name] = value;
+      return prevState;
+    });
   };
+
   handleBlur = () => {
     this.saveQueryString(this.state);
   }
@@ -47,33 +69,46 @@ class BalanceSheetForm extends React.Component<Props, State> {
   }
 
   generateTextField = (elem: BSItem) => {
-    const val = this.state[elem.name] ? this.state[elem.name] : '';
+    const val = this.state.bs[elem.dateIndex][elem.name] ? this.state.bs[elem.dateIndex][elem.name] : '';
     return <TextField
-      id={`bs-${elem.name}`}
-      key={`bs-${elem.name}`}
+      id={`bs-${elem.dateIndex}-${elem.name}`}
+      key={`bs-${elem.dateIndex}-${elem.name}`}
       label={`${elem.label}`}
       value={val}
-      onChange={this.handleChange(elem.name)}
+      onChange={this.handleChangeBS(elem.dateIndex, elem.name)}
       onBlur={this.handleBlur}
     />
   }
 
   render() {
-    const assetFields = assetItems.map(function(elem) {
-      return this.generateTextField(elem);
-    }, this);
-
-    const liabilityFields = liabilityItems.map(function(elem) {
-      return this.generateTextField(elem);
+    const fields = this.state.bs.map((bs, index) => {
+      return (
+        <div key={`input-form-${index}`}>
+          <h2>{bs.date}</h2>
+          <Grid container spacing={8}>
+            <Grid item xs={4}>
+              <h3>資産</h3>
+              {assetItems.map(function(elem) {
+                return this.generateTextField({ name: elem.name, label: elem.label, dateIndex: index });
+              }, this)}
+            </Grid>
+            <Grid item xs={4}>
+              <h3>負債</h3>
+              {liabilityItems.map(function(elem) {
+                return this.generateTextField({ name: elem.name, label: elem.label, dateIndex: index });
+              }, this)}
+            </Grid>
+          </Grid>
+        </div>
+      );
     }, this);
 
     return (
       <>
-        <form>
-          {assetFields}
-          {liabilityFields}
-        </form>
         <Graph data={this.state} />
+        <form>
+          {fields}
+        </form>
       </>
     );
   }
