@@ -143,10 +143,9 @@ class BalanceSheetForm extends React.Component<Props, State> {
   generateTextField = (elem: IBSItem) => {
     const val = this.state.bs[elem.dateIndex][elem.name] ? this.state.bs[elem.dateIndex][elem.name] : 0;
     return (
-      <div>
+      <div key={`bs-${elem.dateIndex}-${elem.name}`}>
         <TextField
           id={`bs-${elem.dateIndex}-${elem.name}`}
-          key={`bs-${elem.dateIndex}-${elem.name}`}
           label={`${elem.label}`}
           value={val}
           onChange={this.handleChangeBS(elem.dateIndex, elem.name)}

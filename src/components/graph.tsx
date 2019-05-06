@@ -1,5 +1,5 @@
 import React from 'react';
-import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts';
+import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList} from 'recharts';
 import Color from 'color';
 import { assetItems, liabilityItems } from './config';
 
@@ -15,14 +15,28 @@ const formatter = (number: number) => {
   }
 }
 
+const bsBar = (color, elem, stackId) => {
+  return (<Bar
+      stackId={stackId}
+      key={elem.name}
+      dataKey={elem.name}
+      name={elem.label}
+      fill={color.string()}
+      stroke="#333"
+    >
+      <LabelList dataKey={elem.name} formatter={(v) => { return `${elem.label} ${v}`; }} />
+    </Bar>
+  );
+}
+
 const Graph = (data) => {
   const assetBars = assetItems.map(function(elem, index) {
     const color = Color.rgb(255, 64, 0).lighten(0.1 + index * 0.25);
-    return <Bar stackId="a" key={elem.name} dataKey={elem.name} name={elem.label} fill={color.string()} stroke="#333" label />;
+    return bsBar(color, elem, 'a');
   }).reverse();
   const liabilityBars = liabilityItems.map(function(elem, index) {
     const color = Color.rgb(0, 164, 255).lighten(0.1 + index * 0.25);
-    return <Bar stackId="b" key={elem.name} dataKey={elem.name} name={elem.label} fill={color.string()} stroke="#333" label />;
+    return bsBar(color, elem, 'b');
   }).reverse();
 
   const graphData = data.data.bs.map((bs, index) => {
